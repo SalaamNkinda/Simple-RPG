@@ -1,4 +1,4 @@
-#RPG Game
+# RPG Game
 
 This is a simple medieval-themed RPG game built using HTML, CSS, and JavaScript. Players can fight monsters, level up, and manage their resources while progressing through the game.
 
