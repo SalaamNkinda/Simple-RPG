@@ -5,10 +5,24 @@ let currentWeapon = 0;
 let fighting;
 let monsterHealth;
 let inventory = ["stick"];
+let level = 1;
+const MAX_LEVEL = 10;
+const MAX_GOLD = 500;
+let slimesDefeated = 0;
+let dragonDefeated = false;
+let monstersDefeated = 0;
+let playerName = "Adventurer";
+let playerAppearance = "warrior";
 
 const button1 = document.querySelector('#button1');
 const button2 = document.querySelector("#button2");
 const button3 = document.querySelector("#button3");
+const button4 = document.querySelector("#button4");
+const button5 = document.querySelector("#button5");
+const button6 = document.querySelector("#button6");
+const button7 = document.querySelector("#button7");
+const button8 = document.querySelector("#button8");
+const button9 = document.querySelector("#button9");
 const text = document.querySelector("#text");
 const xpText = document.querySelector("#xpText");
 const healthText = document.querySelector("#healthText");
@@ -18,36 +32,54 @@ const monsterName = document.querySelector("#monsterName");
 const monsterHealthText = document.querySelector("#monsterHealth");
 
 const weapons = [
-    { name: 'stick', power: 5 },
-    { name: 'dagger', power: 30 },
-    { name: 'claw hammer', power: 50 },
-    { name: 'bow', power: 75 },
-    { name: 'axe', power: 80 },
-    { name: 'crossbow', power: 90 },
-    { name: 'trident', power: 110 },
-    { name: 'sword', power: 100 },
-    { name: 'mace', power: 120 },
-    { name: 'magic staff', power: 150 }
-  ];
-  
-  
+  { name: 'stick', power: 5 },
+  { name: 'dagger', power: 30 },
+  { name: 'claw hammer', power: 50 },
+  { name: 'bow', power: 75 },
+  { name: 'axe', power: 80 },
+  { name: 'crossbow', power: 90 },
+  { name: 'trident', power: 110 },
+  { name: 'sword', power: 100 },
+  { name: 'mace', power: 120 },
+  { name: 'magic staff', power: 150 }
+];
+
 const monsters = [
-  {
-    name: "slime",
-    level: 2,
-    health: 15
-  },
-  {
-    name: "fanged beast",
-    level: 8,
-    health: 60
-  },
-  {
-    name: "dragon",
-    level: 20,
-    health: 300
-  }
-]
+  { name: "slime", level: 2, health: 15, weakness: "fire" },
+  { name: "fanged beast", level: 8, health: 60, weakness: "ice" },
+  { name: "dragon", level: 20, health: 300, weakness: "lightning" },
+  { name: "ghost", level: 5, health: 30, weakness: "holy" },
+  { name: "goblin", level: 3, health: 20, weakness: "physical" }
+];
+
+const quests = [
+  { description: "Defeat 3 slimes", completed: false, reward: 50 },
+  { description: "Collect 100 gold", completed: false, reward: 100 },
+  { description: "Defeat the dragon", completed: false, reward: 200 }
+];
+
+const classes = [
+  { name: "warrior", health: 120, power: 10 },
+  { name: "mage", health: 80, power: 20 },
+  { name: "rogue", health: 100, power: 15 }
+];
+let playerClass = classes[0]; // Default to warrior
+
+const difficulties = [
+  { name: "easy", monsterHealthMultiplier: 0.8, goldMultiplier: 1 },
+  { name: "medium", monsterHealthMultiplier: 1, goldMultiplier: 1.5 },
+  { name: "hard", monsterHealthMultiplier: 1.5, goldMultiplier: 2 }
+];
+let difficulty = difficulties[0]; // Default to easy
+
+const achievements = [
+  { name: "Monster Slayer", condition: "defeat 10 monsters", unlocked: false },
+  { name: "Wealthy Adventurer", condition: "collect 500 gold", unlocked: false }
+];
+
+const leaderboard = [];
+
+// Locations array
 const locations = [
   {
     name: "town square",
@@ -99,10 +131,16 @@ const locations = [
   }
 ];
 
-// initialize buttons
+// Initialize buttons
 button1.onclick = goStore;
 button2.onclick = goCave;
 button3.onclick = fightDragon;
+button4.onclick = showQuests;
+button5.onclick = playMiniGame;
+button6.onclick = setDifficulty;
+button7.onclick = saveGame;
+button8.onclick = loadGame;
+button9.onclick = customizePlayer;
 
 function update(location) {
   monsterStats.style.display = "none";
@@ -238,10 +276,11 @@ function dodge() {
 }
 
 function defeatMonster() {
-  gold += Math.floor(monsters[fighting].level * 6.7);
-  xp += monsters[fighting].level;
-  goldText.innerText = gold;
-  xpText.innerText = xp;
+  let monsterGold = Math.floor(monsters[fighting].level * 5); 
+  gold += monsterGold;
+  xp += monsters[fighting].level * 3; 
+  if (xp > 200) xp = 200;
+  levelUp();
   updateBars();
   update(locations[4]);
 }
@@ -283,28 +322,130 @@ function pickEight() {
 function pick(guess) {
   const numbers = [];
   while (numbers.length < 10) {
-    numbers.push(Math.floor(Math.random() * 11));
+      numbers.push(Math.floor(Math.random() * 11));
   }
   text.innerText = "You picked " + guess + ". Here are the random numbers:\n";
   for (let i = 0; i < 10; i++) {
-    text.innerText += numbers[i] + "\n";
+      text.innerText += numbers[i] + "\n";
   }
   if (numbers.includes(guess)) {
-    text.innerText += "Right! You win 20 gold!";
-    gold += 20;
-    goldText.innerText = gold;
+      text.innerText += "Right! You win 20 gold!";
+      gold += 20;
   } else {
-    text.innerText += "Wrong! You lose 10 health!";
-    health -= 10;
-    healthText.innerText = health;
-    if (health <= 0) {
+      text.innerText += "Wrong! You lose 10 health!";
+      health = Math.max(0, health - 10); 
+  }
+  updateBars();
+  if (health <= 0) {
       lose();
-    }
   }
 }
 
 function updateBars() {
-    document.querySelector("#healthBar div").style.width = health + "%";
-    document.querySelector("#xpBar div").style.width = (xp % 100) + "%";
+  document.querySelector("#healthBar div").style.width = health + "%";
+  document.querySelector("#xpBar div").style.width = Math.min((xp / 200) * 100, 100) + "%";
+  document.querySelector("#goldBar div").style.width = Math.min((gold / MAX_GOLD) * 100, 100) + "%";
+  document.querySelector("#bottomHealthText").innerText = "Health: " + health;
+  document.querySelector("#bottomXpText").innerText = "XP: " + xp + " (Level " + level + ")";
+  document.querySelector("#bottomGoldText").innerText = "Gold: " + gold;
+}
+
+function levelUp() {
+  if (xp >= 100) {
+      level++;
+      xp = 0;
+      health += 20; 
+      gold += 20;
+      alert("You leveled up to Level " + level + "!");
+      if (level === MAX_LEVEL) {
+        alert("You have reached the maximum level!");
+      }
   }
-  
+}
+
+function showQuests() {
+  text.innerText = "Active Quests:\n";
+  quests.forEach((quest, index) => {
+    if (!quest.completed) {
+      text.innerText += `${quest.description}\n`;
+    }
+  });
+}
+
+function playMiniGame() {
+  if (gold < 20) {
+    text.innerText = "You need at least 20 gold to play the mini-game!";
+    return; 
+  }
+
+  text.innerText = "You are gambling 10 gold for a chance to win 50 gold or lose 10 gold. Do you want to proceed?";
+  button5.innerText = "Yes";
+  button5.onclick = confirmMiniGame;
+}
+
+function confirmMiniGame() {
+  const guess = Math.floor(Math.random() * 10);
+  if (guess === 5) {
+    text.innerText = "You won 50 gold!";
+    gold += 50;
+  } else {
+    text.innerText = "You lost 10 gold!";
+    gold -= 10;
+  }
+  updateBars();
+  button5.innerText = "Play Mini-Game";
+  button5.onclick = playMiniGame;
+}
+
+function setDifficulty() {
+  text.innerHTML = `
+    <h3>Choose a difficulty level:</h3>
+    <form id="difficultyForm">
+      <label>
+        <input type="radio" name="difficulty" value="easy" checked> Easy
+      </label><br>
+      <label>
+        <input type="radio" name="difficulty" value="medium"> Medium
+      </label><br>
+      <label>
+        <input type="radio" name="difficulty" value="hard"> Hard
+      </label><br>
+      <button type="button" onclick="applyDifficulty()">Confirm</button>
+    </form>
+  `;
+}
+
+function applyDifficulty() {
+  const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
+  difficulty = difficulties.find(d => d.name === selectedDifficulty);
+  text.innerText = `Difficulty set to ${difficulty.name}.`;
+}
+
+function saveGame() {
+  localStorage.setItem("gameState", JSON.stringify({ xp, health, gold, currentWeapon, inventory, level }));
+  text.innerText = "Game saved!";
+}
+
+function loadGame() {
+  const gameState = JSON.parse(localStorage.getItem("gameState"));
+  if (gameState) {
+    xp = gameState.xp;
+    health = gameState.health;
+    gold = gameState.gold;
+    currentWeapon = gameState.currentWeapon;
+    inventory = gameState.inventory;
+    level = gameState.level;
+    updateBars();
+    text.innerText = "Game loaded!";
+  } else {
+    text.innerText = "No saved game found.";
+  }
+}
+
+function customizePlayer() {
+  playerName = prompt("Enter your character's name:");
+  playerAppearance = prompt("Choose your appearance (warrior, mage, rogue):");
+  text.innerText = `You are now ${playerName}, the ${playerAppearance}!`;
+}
+
+updateBars();
