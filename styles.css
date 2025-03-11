@@ -1,36 +1,36 @@
 body {
     background-color: #1a1a1a;
-    font-family: 'MedievalSharp', cursive;
+    font-family: 'MedievalSharp';
     color: #ffffff;
     text-align: center;
   }
-
-#game {
-    max-width: 600px;
+  
+  #game {
+    max-width: 800px;
     background: linear-gradient(to bottom, #333, #111);
     border: 3px solid #ffd700;
     border-radius: 15px;
     box-shadow: 0px 0px 15px #ffd700;
-    padding: 20px;
-    margin: 30px auto;
-}
-
-#text {
+    padding: 30px;
+    margin: 50px auto;
+  }
+  
+  #text {
     background-color: rgba(255, 255, 255, 0.1);
     padding: 15px;
     font-size: 1.2em;
     border-radius: 10px;
-}
-
-#controls, #stats {
+  }
+  
+  #controls, #stats {
     border: 2px solid #ffd700;
     padding: 10px;
     margin-top: 10px;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
-}
-
-button {
+  }
+  
+  button {
     background-color: #ffd700;
     color: #222;
     font-size: 1.1em;
@@ -39,37 +39,60 @@ button {
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
-}
-
-button:hover {
+    margin: 5px;
+  }
+  
+  button:hover {
     background-color: #ffeb3b;
     transform: scale(1.1);
-}
-
-#monsterStats {
+  }
+  
+  #monsterStats {
     display: none;
     background: rgba(255, 0, 0, 0.2);
     padding: 10px;
     border: 2px solid red;
     border-radius: 10px;
     margin-top: 10px;
-}
-
-.progress-bar {
-    width: 100%;
+  }
+  
+  #bottomStats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
+  }
+  
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .stat-item p {
+    margin: 0;
+    flex: 0 0 80px;
+  }
+  
+  .progress-bar {
+    flex: 1;
     height: 15px;
     background-color: #333;
     border-radius: 5px;
     overflow: hidden;
-    margin: 5px 0;
-}
-
-.progress-bar div {
+  }
+  
+  .progress-bar div {
     height: 100%;
     width: 100%;
     background-color: #ff4444;
     transition: width 0.5s;
-}
-
-#healthBar div { background-color: green; }
-#xpBar div { background-color: blue; }
+  }
+  
+  #healthBar div { background-color: green; }
+  #xpBar div { background-color: blue; }
+  #goldBar div { background-color: #ffd700; }
