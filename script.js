@@ -187,6 +187,7 @@ function buyWeapon() {
       text.innerText = "You now have a " + newWeapon + ".";
       inventory.push(newWeapon);
       text.innerText += " In your inventory you have: " + inventory;
+      updateBars();
     } else {
       text.innerText = "You do not have enough gold to buy a weapon.";
     }
@@ -204,6 +205,7 @@ function sellWeapon() {
     let currentWeapon = inventory.shift();
     text.innerText = "You sold a " + currentWeapon + ".";
     text.innerText += " In your inventory you have: " + inventory;
+    updateBars();
   } else {
     text.innerText = "Don't sell your only weapon!";
   }
@@ -304,6 +306,7 @@ function restart() {
   goldText.innerText = gold;
   healthText.innerText = health;
   xpText.innerText = xp;
+  updateBars();
   goTown();
 }
 
@@ -357,6 +360,7 @@ function levelUp() {
       health += 20; 
       gold += 20;
       alert("You leveled up to Level " + level + "!");
+      updateBars();
       if (level === MAX_LEVEL) {
         alert("You have reached the maximum level!");
       }
